@@ -22,6 +22,8 @@ export interface RoomPlayerSlot {
   info: PlayerInfo;
   socketId: string | null;
   disconnectTimer: NodeJS.Timeout | null;
+  /** Account id when the player is signed in; null for guests (unranked). */
+  userId: string | null;
 }
 
 export class Room {
@@ -30,12 +32,14 @@ export class Room {
   players: [RoomPlayerSlot, RoomPlayerSlot];
   state: MatchState;
   rematchVotes = new Set<string>();
+  /** True once this match's ranking result has been persisted (avoids double counting). */
+  resultRecorded = false;
 
-  constructor(code: string, hostPlayer: PlayerInfo, hostSocketId: string) {
+  constructor(code: string, hostPlayer: PlayerInfo, hostSocketId: string, hostUserId: string | null = null) {
     this.code = code;
     this.players = [
-      { info: hostPlayer, socketId: hostSocketId, disconnectTimer: null },
-      { info: { id: '', name: '', group: null, connected: false }, socketId: null, disconnectTimer: null },
+      { info: hostPlayer, socketId: hostSocketId, disconnectTimer: null, userId: hostUserId },
+      { info: { id: '', name: '', group: null, connected: false }, socketId: null, disconnectTimer: null, userId: null },
     ];
     this.state = this.freshMatchState([hostPlayer, { id: '', name: '', group: null, connected: false }]);
   }
@@ -56,8 +60,8 @@ export class Room {
     return Boolean(this.players[0].info.id && this.players[1].info.id);
   }
 
-  addSecondPlayer(player: PlayerInfo, socketId: string): void {
-    this.players[1] = { info: player, socketId, disconnectTimer: null };
+  addSecondPlayer(player: PlayerInfo, socketId: string, userId: string | null = null): void {
+    this.players[1] = { info: player, socketId, disconnectTimer: null, userId };
     this.state.players = [this.players[0].info, this.players[1].info];
     this.state.phase = 'break';
   }
@@ -223,5 +227,6 @@ export class Room {
     this.players[0].info.group = null;
     this.players[1].info.group = null;
     this.rematchVotes.clear();
+    this.resultRecorded = false;
   }
 }

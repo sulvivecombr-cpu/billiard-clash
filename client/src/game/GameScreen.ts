@@ -10,7 +10,7 @@ import { PowerKeyController } from './PowerKeyController';
 import type { GameSession } from './GameSession';
 import type { SoundManager } from '../audio/SoundManager';
 import type { GameSettings } from '../utils/settings';
-import { groupLabel } from '../utils/labels';
+import { groupLabel, rankLabel } from '../utils/labels';
 
 export interface GameScreenCallbacks {
   onExitToMenu: () => void;
@@ -388,11 +388,13 @@ export class GameScreen {
       <div class="hud-row">
         <div class="hud-player ${myTurn && !gameOver ? 'hud-player--active' : ''}">
           <span class="hud-name">${escapeHtml(me.name)}</span>
+          ${rankBadge(me.rating)}
           ${me.group ? `<span class="hud-group">${groupLabel(me.group)}</span>` : ''}
         </div>
         <div class="hud-turn-indicator">${turnLabel}</div>
         <div class="hud-player ${!myTurn && !gameOver ? 'hud-player--active' : ''}">
           <span class="hud-name">${escapeHtml(opponent.name)}</span>
+          ${rankBadge(opponent.rating)}
           ${opponent.group ? `<span class="hud-group">${groupLabel(opponent.group)}</span>` : ''}
         </div>
       </div>
@@ -494,4 +496,10 @@ function escapeHtml(s: string): string {
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
+}
+
+/** Rank badge shown next to a signed-in player's name in the HUD. Guests have no rating. */
+function rankBadge(rating: number | null | undefined): string {
+  if (rating == null) return '';
+  return `<span class="hud-rank">${rankLabel(rating)} · ${rating}</span>`;
 }

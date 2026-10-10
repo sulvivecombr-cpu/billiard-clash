@@ -1,8 +1,16 @@
 import { fetchMe, login, logout, register, updateProfile, type AuthUser } from '../../utils/auth';
+import { rankLabel } from '../../utils/labels';
 
 type Mode = 'login' | 'register';
 
-export function renderProfile(root: HTMLElement, onBack: () => void): void {
+export interface ProfileCallbacks {
+  onBack: () => void;
+  onOpenStore: () => void;
+}
+
+export function renderProfile(root: HTMLElement, cb: ProfileCallbacks): void {
+  const onBack = cb.onBack;
+  const onOpenStore = cb.onOpenStore;
   let mode: Mode = 'login';
   let user: AuthUser | null = null;
   let loading = true;
@@ -82,6 +90,7 @@ export function renderProfile(root: HTMLElement, onBack: () => void): void {
           draw();
         }
       });
+      root.querySelector('#open-store')!.addEventListener('click', onOpenStore);
       root.querySelector('#logout')!.addEventListener('click', () => {
         logout();
         user = null;
@@ -122,6 +131,7 @@ export function renderProfile(root: HTMLElement, onBack: () => void): void {
 
   function profileView(u: AuthUser): string {
     const since = new Date(u.createdAt).toLocaleDateString('pt-BR');
+    const winRate = u.gamesPlayed > 0 ? Math.round((u.wins / u.gamesPlayed) * 100) : 0;
     return `
       <div class="profile-summary">
         <div class="eyebrow">Conectado como</div>
@@ -129,6 +139,28 @@ export function renderProfile(root: HTMLElement, onBack: () => void): void {
         <div class="profile-email">${escapeHtml(u.email)}</div>
         <div class="profile-since">Membro desde ${since}</div>
       </div>
+
+      <div class="profile-rank">
+        <div class="profile-rank-badge">${escapeHtml(rankLabel(u.rating))}</div>
+        <div class="profile-rank-info">
+          <span class="profile-rank-rating">${u.rating} pontos</span>
+          <span class="profile-rank-tier">Ranking de ${escapeHtml(rankLabel(u.rating))}</span>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="profile-stat"><span class="profile-stat-value">${u.wins}</span><span class="profile-stat-label">Vitórias</span></div>
+        <div class="profile-stat"><span class="profile-stat-value">${u.losses}</span><span class="profile-stat-label">Derrotas</span></div>
+        <div class="profile-stat"><span class="profile-stat-value">${u.gamesPlayed}</span><span class="profile-stat-label">Partidas</span></div>
+        <div class="profile-stat"><span class="profile-stat-value">${winRate}%</span><span class="profile-stat-label">Aproveitamento</span></div>
+      </div>
+
+      <div class="profile-tokens">
+        <span class="eyebrow">Fichas</span>
+        <span class="profile-tokens-value">${u.tokens}</span>
+        <button class="btn btn-secondary btn-small" id="open-store">Comprar Fichas</button>
+      </div>
+
       <div class="field-group">
         <label class="field-label eyebrow" for="display-name">Nome de Exibição</label>
         <input class="field" type="text" id="display-name" maxlength="24" value="${escapeAttr(u.displayName)}" />

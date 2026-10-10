@@ -21,6 +21,8 @@ export interface PlayerInfo {
   name: string;
   group: BallGroup | null;
   connected: boolean;
+  /** Ranking rating, when the player is signed in. Guests have no rating. */
+  rating?: number | null;
 }
 
 export type FoulReason =

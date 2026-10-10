@@ -4,8 +4,9 @@ import type {
   ServerToClientEvents,
 } from '@pool/shared';
 import { isLegalCueBallPlacement } from '@pool/shared';
-import { RoomManager } from '../rooms/RoomManager';
+import { RoomManager, type PlayerAccount } from '../rooms/RoomManager';
 import { validatePlayerName, validateRoomCodeInput, validateShotRequest } from '../validation/validators';
+import { finalizeRankedMatch } from '../ranking/matchResult';
 
 type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -13,15 +14,24 @@ type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 // Maps socket.id -> { roomCode, playerId } for quick lookup on disconnect.
 const socketSessions = new Map<string, { roomCode: string; playerId: string }>();
 
+/** Account attached to a socket by the auth middleware, when the player is signed in. */
+function accountOf(socket: TypedSocket): PlayerAccount | null {
+  const user = (socket.data as { user?: PlayerAccount }).user;
+  return user ?? null;
+}
+
 export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager): void {
   io.on('connection', (socket: TypedSocket) => {
     socket.on('create_room', (payload, ack) => {
-      const nameCheck = validatePlayerName(payload?.playerName);
+      const account = accountOf(socket);
+      // Signed-in players play under their account name; guests use the typed name.
+      const playerName = account?.displayName ?? payload?.playerName;
+      const nameCheck = validatePlayerName(playerName);
       if (!nameCheck.valid) {
         return ack({ ok: false, error: { code: 'INVALID_ROOM_CODE', message: nameCheck.reason! } });
       }
 
-      const { room, playerId } = roomManager.createRoom(payload.playerName, socket.id);
+      const { room, playerId } = roomManager.createRoom(playerName, socket.id, account);
       socket.join(room.code);
       socketSessions.set(socket.id, { roomCode: room.code, playerId });
 
@@ -30,8 +40,10 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
     });
 
     socket.on('join_room', (payload, ack) => {
+      const account = accountOf(socket);
+      const playerName = account?.displayName ?? payload?.playerName;
       const codeCheck = validateRoomCodeInput(payload?.roomCode);
-      const nameCheck = validatePlayerName(payload?.playerName);
+      const nameCheck = validatePlayerName(playerName);
       if (!codeCheck.valid) {
         return ack({ ok: false, error: { code: 'INVALID_ROOM_CODE', message: codeCheck.reason! } });
       }
@@ -39,7 +51,7 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
         return ack({ ok: false, error: { code: 'INVALID_ROOM_CODE', message: nameCheck.reason! } });
       }
 
-      const result = roomManager.joinRoom(payload.roomCode, payload.playerName, socket.id);
+      const result = roomManager.joinRoom(payload.roomCode, playerName, socket.id, account);
       if ('error' in result) {
         const message = result.error === 'ROOM_NOT_FOUND' ? 'Esse código de sala não existe.' : 'Essa sala já está cheia.';
         return ack({ ok: false, error: { code: result.error, message } });
@@ -134,8 +146,13 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
       });
 
       // Phase 2: resolve authoritatively and broadcast the final result.
-      room.resolveShot();
+      const { result: resolvedResult } = room.resolveShot();
       io.to(room.code).emit('shot_applied', { ...room.state, roomCode: room.code, shotId });
+
+      // A match just ended — award ranking points when both players are signed in.
+      if (resolvedResult.gameWinnerId) {
+        void finalizeRankedMatch(io, room);
+      }
     });
 
     socket.on('request_rematch', (payload) => {

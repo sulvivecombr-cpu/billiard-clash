@@ -1,5 +1,6 @@
 import { io, type Socket } from 'socket.io-client';
 import type { ClientToServerEvents, ServerToClientEvents } from '@pool/shared';
+import { getToken } from '../utils/session';
 
 const SERVER_URL = (import.meta as any).env?.VITE_SERVER_URL || 'http://localhost:3001';
 
@@ -9,7 +10,13 @@ let socket: GameSocket | null = null;
 
 export function getSocket(): GameSocket {
   if (!socket) {
-    socket = io(SERVER_URL, { autoConnect: true, transports: ['websocket'] });
+    socket = io(SERVER_URL, {
+      autoConnect: true,
+      transports: ['websocket'],
+      // Sent on every (re)connect so the server can identify the signed-in
+      // player; read lazily so a login/logout is picked up on reconnect.
+      auth: (cb) => cb({ token: getToken() }),
+    });
   }
   return socket;
 }

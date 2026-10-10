@@ -787,3 +787,212 @@ input[type='text']:focus {
     display: none;
   }
 }
+
+/* ---------- Ranking & profile stats ---------- */
+.hud-rank {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--brass-bright);
+  text-transform: uppercase;
+}
+
+.profile-rank {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 75, 0.3);
+}
+
+.profile-rank-badge {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--bg-void);
+  background: linear-gradient(135deg, var(--brass-bright), var(--brass));
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.7rem;
+  white-space: nowrap;
+}
+
+.profile-rank-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-rank-rating {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-rank-tier {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.6rem 0.3rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel-raised);
+}
+
+.profile-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--brass-bright);
+}
+
+.profile-stat-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.profile-tokens {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+}
+
+.profile-tokens-value {
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--brass-bright);
+  flex: 1;
+}
+
+/* ---------- Online identity ---------- */
+.online-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 75, 0.25);
+}
+
+.online-identity-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+}
+
+.online-rank {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--brass-bright);
+  text-transform: uppercase;
+}
+
+.online-ranked-note {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+/* ---------- Token store ---------- */
+.store-balance {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+}
+
+.store-balance-value {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--brass-bright);
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.store-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+  box-shadow: inset 0 0 0 1px rgba(243, 237, 224, 0.08);
+}
+
+.store-card--highlight {
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 75, 0.55);
+}
+
+.store-tag {
+  position: absolute;
+  top: -0.6rem;
+  right: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--bg-void);
+  background: var(--brass-bright);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.store-card-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.store-card-tokens {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--brass-bright);
+}
+
+.store-card-bonus {
+  font-size: 0.72rem;
+  color: var(--success);
+}
+
+.store-card-price {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0.5rem;
+}
+
+.store-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
+}
+
+.store-hint--warning {
+  color: var(--brass-bright);
+}

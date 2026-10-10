@@ -1,5 +1,7 @@
 import type { MatchState } from '@pool/shared';
 import { getSocket } from '../../multiplayer/SocketClient';
+import { fetchMe, getToken, type AuthUser } from '../../utils/auth';
+import { rankLabel } from '../../utils/labels';
 
 export interface OnlineMenuCallbacks {
   onMatchReady: (roomCode: string, playerId: string, state: MatchState) => void;
@@ -11,21 +13,38 @@ type Tab = 'choose' | 'create' | 'join';
 export function renderOnlineMenu(root: HTMLElement, defaultName: string, cb: OnlineMenuCallbacks): void {
   let tab: Tab = 'choose';
   let playerName = defaultName || 'Jogador';
+  let user: AuthUser | null = null;
   let createdRoomCode: string | undefined;
   let createdPlayerId: string | undefined;
   let activeCleanup: (() => void) | null = null;
 
+  /** The signed-in account takes over the player name (and carries the ranking). */
+  function resolveName(): string {
+    if (user) return user.displayName;
+    const input = root.querySelector('#player-name') as HTMLInputElement | null;
+    return input?.value.trim() || 'Jogador';
+  }
+
   function draw(): void {
     if (tab === 'choose') {
+      const identity = user
+        ? `<div class="online-identity">
+             <span class="eyebrow">Jogando como</span>
+             <span class="online-identity-name">${escapeHtml(user.displayName)}</span>
+             <span class="online-rank">${escapeHtml(rankLabel(user.rating))} · ${user.rating}</span>
+             <span class="online-ranked-note">Partidas ranqueadas valem pontos no ranking.</span>
+           </div>`
+        : `<div class="field-group">
+             <label class="field-label eyebrow" for="player-name">Nome do Jogador</label>
+             <input class="field" type="text" id="player-name" maxlength="24" value="${escapeAttr(playerName)}" />
+           </div>
+           <p class="online-ranked-note">Jogue como convidado ou entre na sua conta para disputar partidas ranqueadas.</p>`;
       root.innerHTML = `
         <div class="menu-screen screen-enter">
           <button class="back-link" id="back">&larr; Menu Principal</button>
           <div class="panel menu-panel">
             <h2>JOGAR ONLINE</h2>
-            <div class="field-group">
-              <label class="field-label eyebrow" for="player-name">Nome do Jogador</label>
-              <input class="field" type="text" id="player-name" maxlength="24" value="${escapeAttr(playerName)}" />
-            </div>
+            ${identity}
             <div class="menu-actions">
               <button class="btn btn-primary" id="create-room">Criar Sala</button>
               <button class="btn btn-secondary" id="join-room">Entrar na Sala</button>
@@ -39,13 +58,13 @@ export function renderOnlineMenu(root: HTMLElement, defaultName: string, cb: Onl
         cb.onBack();
       });
       root.querySelector('#create-room')!.addEventListener('click', () => {
-        playerName = (root.querySelector('#player-name') as HTMLInputElement).value.trim() || 'Jogador';
+        playerName = resolveName();
         tab = 'create';
         draw();
         startCreateFlow();
       });
       root.querySelector('#join-room')!.addEventListener('click', () => {
-        playerName = (root.querySelector('#player-name') as HTMLInputElement).value.trim() || 'Jogador';
+        playerName = resolveName();
         tab = 'join';
         draw();
       });
@@ -164,11 +183,19 @@ export function renderOnlineMenu(root: HTMLElement, defaultName: string, cb: Onl
     });
   }
 
-  draw();
+  // Draw synchronously for guests; only signed-in players need the async lookup.
+  void (async () => {
+    if (getToken()) user = await fetchMe();
+    draw();
+  })();
 }
 
-function escapeAttr(s: string): string {
+function escapeHtml(s: string): string {
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
+}
+
+function escapeAttr(s: string): string {
+  return escapeHtml(s);
 }

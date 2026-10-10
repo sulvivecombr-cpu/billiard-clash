@@ -1,23 +1,8 @@
-import { Router, type NextFunction, type Request, type Response } from 'express';
+import { Router } from 'express';
 import { pool } from '../db';
 import { hashPassword, verifyPassword } from './passwords';
-import { signToken, verifyToken } from './tokens';
-
-interface UserRow {
-  id: string;
-  email: string;
-  password_hash: string;
-  display_name: string;
-  created_at: string;
-}
-
-interface AuthedRequest extends Request {
-  user?: UserRow;
-}
-
-function toUser(row: UserRow) {
-  return { id: row.id, email: row.email, displayName: row.display_name, createdAt: row.created_at };
-}
+import { signToken } from './tokens';
+import { authenticate, toUser, type AuthedRequest, type UserRow } from './middleware';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -41,7 +26,7 @@ authRouter.post('/register', async (req, res) => {
     const result = await pool.query<UserRow>(
       `INSERT INTO users (email, password_hash, display_name)
        VALUES ($1, $2, $3)
-       RETURNING id, email, password_hash, display_name, created_at`,
+       RETURNING *`,
       [email, hashPassword(password), displayName]
     );
     const row = result.rows[0];
@@ -74,25 +59,6 @@ authRouter.post('/login', async (req, res) => {
   }
 });
 
-async function authenticate(req: AuthedRequest, res: Response, next: NextFunction) {
-  const header = req.headers.authorization ?? '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : '';
-  const userId = token ? verifyToken(token) : null;
-  if (!userId) return res.status(401).json({ error: 'Não autenticado.' });
-
-  try {
-    const result = await pool.query<UserRow>(`SELECT * FROM users WHERE id = $1`, [userId]);
-    const row = result.rows[0];
-    if (!row) return res.status(401).json({ error: 'Não autenticado.' });
-    req.user = row;
-    next();
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('auth lookup failed', err);
-    res.status(500).json({ error: 'Erro de autenticação.' });
-  }
-}
-
 authRouter.get('/me', authenticate, (req: AuthedRequest, res) => {
   res.json({ user: toUser(req.user!) });
 });
@@ -104,7 +70,7 @@ authRouter.patch('/profile', authenticate, async (req: AuthedRequest, res) => {
   }
   try {
     const result = await pool.query<UserRow>(
-      `UPDATE users SET display_name = $1 WHERE id = $2 RETURNING id, email, password_hash, display_name, created_at`,
+      `UPDATE users SET display_name = $1 WHERE id = $2 RETURNING *`,
       [displayName, req.user!.id]
     );
     return res.json({ user: toUser(result.rows[0]) });
