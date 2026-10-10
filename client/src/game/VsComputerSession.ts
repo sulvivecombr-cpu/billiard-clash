@@ -2,6 +2,7 @@ import type { MatchState, ShotRequest, Difficulty } from '@pool/shared';
 import { PHYSICS } from '@pool/shared';
 import { LocalMatchEngine } from './LocalMatchEngine';
 import { planAIShot, planAIBallInHandPlacement } from '../ai/AIOpponent';
+import { DIFFICULTY_LABELS } from '../utils/labels';
 import type { GameSession } from './GameSession';
 
 export class VsComputerSession implements GameSession {
@@ -17,7 +18,7 @@ export class VsComputerSession implements GameSession {
   onAIThinkingChange?: (thinking: boolean) => void;
 
   constructor(humanName: string, difficulty: Difficulty) {
-    this.engine = new LocalMatchEngine({ humanName, computerName: `Computer (${difficulty})` });
+    this.engine = new LocalMatchEngine({ humanName, computerName: `Computador (${DIFFICULTY_LABELS[difficulty]})` });
     this.myPlayerId = this.engine.humanId;
     this.difficulty = difficulty;
   }
@@ -136,7 +137,7 @@ export class VsComputerSession implements GameSession {
     this.aiThinking = false;
     this.simulating = false;
     const p1 = this.engine.state.players[0].name;
-    this.engine = new LocalMatchEngine({ humanName: p1, computerName: `Computer (${this.difficulty})` });
+    this.engine = new LocalMatchEngine({ humanName: p1, computerName: `Computador (${DIFFICULTY_LABELS[this.difficulty]})` });
     this.emitState();
   }
 

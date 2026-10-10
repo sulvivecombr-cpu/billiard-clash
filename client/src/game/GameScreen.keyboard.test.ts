@@ -123,6 +123,6 @@ describe('GameScreen — layout-independent shot power keys (end-to-end)', () =>
   it('Escape still pauses regardless of held power keys', () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyW', key: 'ش' }));
     window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape' }));
-    expect(root.querySelector('.modal h2')?.textContent).toContain('PAUSED');
+    expect(root.querySelector('.modal h2')?.textContent).toContain('PAUSA');
   });
 });

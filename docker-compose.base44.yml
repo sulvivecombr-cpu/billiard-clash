@@ -1,4 +1,19 @@
 services:
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=billiard
+      - POSTGRES_PASSWORD=billiard_dev_pw
+      - POSTGRES_DB=billiard
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U billiard -d billiard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: on-failure
+
   app:
     image: node:22
     working_dir: /app
@@ -7,14 +22,20 @@ services:
       - app_node_modules:/app/node_modules
     ports:
       - "3000:5173"   # Vite client (web entry point)
-      - "8000:3001"   # Express + Socket.IO server
+      - "8000:3001"   # Express + Socket.IO + auth API
     environment:
       - PORT=3001
       - CLIENT_ORIGIN=https://3000-${BASE44_PUBLIC_HOST_SUFFIX}
       - VITE_SERVER_URL=https://8000-${BASE44_PUBLIC_HOST_SUFFIX}
+      - DATABASE_URL=postgres://billiard:billiard_dev_pw@db:5432/billiard
       - BASE44_PREVIEW_MODE=1
       - BASE44_SANDBOX_HOST_DOMAIN
       - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    env_file:
+      - /run/base44/app.env   # platform-managed secrets (JWT_SECRET) — always last
+    depends_on:
+      db:
+        condition: service_healthy
     command: ["sh", "-ec", "npm install && npm run build:shared && exec npm run dev"]
     restart: on-failure
     healthcheck:
@@ -35,3 +56,4 @@ services:
 
 volumes:
   app_node_modules:
+  db_data:

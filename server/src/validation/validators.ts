@@ -7,17 +7,17 @@ export interface ValidationResult {
 
 export function validateRoomCodeInput(code: unknown): ValidationResult {
   if (typeof code !== 'string' || !isValidRoomCode(code)) {
-    return { valid: false, reason: 'Room code must look like 8B-XXXX.' };
+    return { valid: false, reason: 'O código da sala deve ter o formato 8B-XXXX.' };
   }
   return { valid: true };
 }
 
 export function validatePlayerName(name: unknown): ValidationResult {
   if (typeof name !== 'string' || name.trim().length === 0) {
-    return { valid: false, reason: 'Player name is required.' };
+    return { valid: false, reason: 'O nome do jogador é obrigatório.' };
   }
   if (name.length > 24) {
-    return { valid: false, reason: 'Player name must be 24 characters or fewer.' };
+    return { valid: false, reason: 'O nome do jogador deve ter no máximo 24 caracteres.' };
   }
   return { valid: true };
 }
@@ -25,7 +25,7 @@ export function validatePlayerName(name: unknown): ValidationResult {
 /** Validates the shape and numeric bounds of a shot request from an untrusted client. */
 export function validateShotRequest(shot: unknown): ValidationResult {
   if (typeof shot !== 'object' || shot === null) {
-    return { valid: false, reason: 'Malformed shot payload.' };
+    return { valid: false, reason: 'Requisição de tacada inválida.' };
   }
   const s = shot as Partial<ShotRequest>;
 
@@ -37,17 +37,17 @@ export function validateShotRequest(shot: unknown): ValidationResult {
     !Number.isFinite(s.direction.y) ||
     (s.direction.x === 0 && s.direction.y === 0)
   ) {
-    return { valid: false, reason: 'Shot direction must be a non-zero finite vector.' };
+    return { valid: false, reason: 'A direção da tacada deve ser um vetor finito diferente de zero.' };
   }
 
   if (typeof s.power !== 'number' || !Number.isFinite(s.power) || s.power < SHOT_POWER.MIN || s.power > SHOT_POWER.MAX) {
-    return { valid: false, reason: `Shot power must be between ${SHOT_POWER.MIN} and ${SHOT_POWER.MAX}.` };
+    return { valid: false, reason: `A força da tacada deve estar entre ${SHOT_POWER.MIN} e ${SHOT_POWER.MAX}.` };
   }
 
   if (s.cueBallPlacement) {
     const { x, y } = s.cueBallPlacement;
     if (typeof x !== 'number' || typeof y !== 'number' || !Number.isFinite(x) || !Number.isFinite(y)) {
-      return { valid: false, reason: 'Cue ball placement must be a finite point.' };
+      return { valid: false, reason: 'O posicionamento da bola branca deve ser um ponto finito.' };
     }
   }
 

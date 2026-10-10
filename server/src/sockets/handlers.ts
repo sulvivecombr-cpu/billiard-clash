@@ -41,7 +41,7 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
 
       const result = roomManager.joinRoom(payload.roomCode, payload.playerName, socket.id);
       if ('error' in result) {
-        const message = result.error === 'ROOM_NOT_FOUND' ? 'That room code does not exist.' : 'That room is already full.';
+        const message = result.error === 'ROOM_NOT_FOUND' ? 'Esse código de sala não existe.' : 'Essa sala já está cheia.';
         return ack({ ok: false, error: { code: result.error, message } });
       }
 
@@ -57,11 +57,11 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
     socket.on('rejoin_room', (payload, ack) => {
       const room = roomManager.getRoom(payload?.roomCode ?? '');
       if (!room) {
-        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'That room no longer exists.' } });
+        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'Essa sala não existe mais.' } });
       }
       const slot = room.getPlayerSlot(payload.playerId);
       if (!slot) {
-        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'You are not part of that room.' } });
+        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'Você não faz parte dessa sala.' } });
       }
 
       room.markReconnected(payload.playerId, socket.id);
@@ -76,17 +76,17 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
     socket.on('take_shot', (payload, ack) => {
       const session = socketSessions.get(socket.id);
       if (!session || session.roomCode !== payload?.roomCode) {
-        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'You are not in that room.' } });
+        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'Você não está nessa sala.' } });
       }
       const room = roomManager.getRoom(session.roomCode);
       if (!room) {
-        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'Room no longer exists.' } });
+        return ack({ ok: false, error: { code: 'ROOM_NOT_FOUND', message: 'A sala não existe mais.' } });
       }
       if (!room.isFull() || room.state.phase === 'game_over') {
-        return ack({ ok: false, error: { code: 'MATCH_NOT_ACTIVE', message: 'Match is not active.' } });
+        return ack({ ok: false, error: { code: 'MATCH_NOT_ACTIVE', message: 'A partida não está ativa.' } });
       }
       if (!room.isPlayersTurn(session.playerId)) {
-        return ack({ ok: false, error: { code: 'NOT_YOUR_TURN', message: 'It is not your turn.' } });
+        return ack({ ok: false, error: { code: 'NOT_YOUR_TURN', message: 'Não é a sua vez.' } });
       }
       const shotCheck = validateShotRequest(payload.shot);
       if (!shotCheck.valid) {
@@ -99,7 +99,7 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
       // accepting the shot at all.
       if (room.state.ballInHand) {
         if (!payload.shot.cueBallPlacement) {
-          return ack({ ok: false, error: { code: 'INVALID_PLACEMENT', message: 'Ball-in-hand requires a cue ball placement.' } });
+          return ack({ ok: false, error: { code: 'INVALID_PLACEMENT', message: 'Bola na mão exige o posicionamento da bola branca.' } });
         }
         const restricted = room.isBallInHandRestrictedToHeadString();
         const legal = isLegalCueBallPlacement(payload.shot.cueBallPlacement, room.state.balls, {
@@ -111,8 +111,8 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
             error: {
               code: 'INVALID_PLACEMENT',
               message: restricted
-                ? 'Illegal placement: must be behind the head string after a break foul.'
-                : 'Illegal placement: must be on the table and not overlap another ball.',
+                ? 'Posicionamento inválido: deve ficar atrás da linha de saída após uma falta na tacada inicial.'
+                : 'Posicionamento inválido: deve estar sobre a mesa e não sobrepor outra bola.',
             },
           });
         }
@@ -188,7 +188,7 @@ function handleDeparture(
     // Grace period expired with no reconnect: tear the room down.
     io.to(room.code).emit('error_message', {
       code: 'MATCH_NOT_ACTIVE',
-      message: 'Opponent did not reconnect in time. The match has ended.',
+      message: 'O oponente não reconectou a tempo. A partida foi encerrada.',
     });
     roomManager.removeRoom(room.code);
   });

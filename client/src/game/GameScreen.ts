@@ -10,6 +10,7 @@ import { PowerKeyController } from './PowerKeyController';
 import type { GameSession } from './GameSession';
 import type { SoundManager } from '../audio/SoundManager';
 import type { GameSettings } from '../utils/settings';
+import { groupLabel } from '../utils/labels';
 
 export interface GameScreenCallbacks {
   onExitToMenu: () => void;
@@ -250,13 +251,13 @@ export class GameScreen {
   private renderPauseMenu(): void {
     this.overlayEl.innerHTML = `
       <div class="modal panel screen-enter">
-        <div class="eyebrow">Paused</div>
-        <h2>PAUSED</h2>
+        <div class="eyebrow">Pausado</div>
+        <h2>PAUSA</h2>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="resume-btn">Resume</button>
-          <button class="btn btn-secondary" id="mainmenu-btn">Main Menu</button>
+          <button class="btn btn-primary" id="resume-btn">Continuar</button>
+          <button class="btn btn-secondary" id="mainmenu-btn">Menu Principal</button>
         </div>
-        <p class="modal-note">${this.session.mode === 'online' ? 'One player cannot restart an online match unilaterally.' : ''}</p>
+        <p class="modal-note">${this.session.mode === 'online' ? 'Um jogador não pode reiniciar uma partida online sozinho.' : ''}</p>
       </div>
     `;
     this.overlayEl.querySelector('#resume-btn')!.addEventListener('click', () => this.togglePause());
@@ -303,11 +304,11 @@ export class GameScreen {
     this.overlayEl.innerHTML = `
       <div class="modal panel screen-enter result-modal">
         ${iWon ? '<div class="confetti-layer" id="confetti"></div>' : ''}
-        <h2 class="result-title">${iWon ? '🏆 YOU WIN' : 'YOU LOSE'}</h2>
-        ${winner && loser ? `<p class="modal-result-detail">${escapeHtml(winner.name)} defeated ${escapeHtml(loser.name)}</p>` : ''}
+        <h2 class="result-title">${iWon ? '🏆 VOCÊ VENCEU' : 'VOCÊ PERDEU'}</h2>
+        ${winner && loser ? `<p class="modal-result-detail">${escapeHtml(winner.name)} derrotou ${escapeHtml(loser.name)}</p>` : ''}
         <div class="modal-actions">
-          <button class="btn btn-primary" id="rematch-btn">${this.session.mode === 'online' ? 'Request Rematch' : 'Play Again'}</button>
-          <button class="btn btn-secondary" id="mainmenu-btn">Main Menu</button>
+          <button class="btn btn-primary" id="rematch-btn">${this.session.mode === 'online' ? 'Pedir Revanche' : 'Jogar Novamente'}</button>
+          <button class="btn btn-secondary" id="mainmenu-btn">Menu Principal</button>
         </div>
         <p class="modal-note" id="rematch-note"></p>
       </div>
@@ -315,7 +316,7 @@ export class GameScreen {
     this.overlayEl.querySelector('#rematch-btn')!.addEventListener('click', () => {
       this.session.requestRematch();
       const note = this.overlayEl.querySelector('#rematch-note');
-      if (note && this.session.mode === 'online') note.textContent = 'Waiting for opponent to agree…';
+      if (note && this.session.mode === 'online') note.textContent = 'Aguardando o oponente aceitar…';
     });
     this.overlayEl.querySelector('#mainmenu-btn')!.addEventListener('click', () => this.exitToMenu());
 
@@ -360,26 +361,26 @@ export class GameScreen {
     const gameOver = state.phase === 'game_over';
 
     const statusLabel: Record<string, string> = {
-      connected: 'CONNECTED',
-      connecting: 'CONNECTING…',
-      opponent_disconnected: 'OPPONENT DISCONNECTED',
-      reconnecting: 'RECONNECTING…',
+      connected: 'CONECTADO',
+      connecting: 'CONECTANDO…',
+      opponent_disconnected: 'OPONENTE DESCONECTADO',
+      reconnecting: 'RECONECTANDO…',
     };
 
     const turnLabel = gameOver
-      ? 'GAME OVER'
+      ? 'FIM DE JOGO'
       : myTurn
-        ? 'YOUR TURN'
+        ? 'SUA VEZ'
         : this.session.mode === 'vs_computer'
-          ? 'COMPUTER THINKING…'
-          : 'OPPONENT TURN';
+          ? 'COMPUTADOR PENSANDO…'
+          : 'VEZ DO OPONENTE';
 
     let placementBanner = '';
     if (!gameOver && state.ballInHand && myTurn) {
       if (this.ballInHandStage === 'placing') {
-        placementBanner = `<div class="hud-banner">BALL IN HAND — move the mouse and click to place the cue ball${this.isPlacementRestricted(state) ? ' (behind the head string)' : ''}</div>`;
+        placementBanner = `<div class="hud-banner">BOLA NA MÃO — mova o mouse e clique para posicionar a bola branca${this.isPlacementRestricted(state) ? ' (atrás da linha de saída)' : ''}</div>`;
       } else if (this.ballInHandStage === 'aiming') {
-        placementBanner = `<div class="hud-banner hud-banner--neutral">BALL IN HAND — positioned. <button class="btn btn-ghost btn-small" id="reposition-btn">Reposition</button></div>`;
+        placementBanner = `<div class="hud-banner hud-banner--neutral">BOLA NA MÃO — posicionada. <button class="btn btn-ghost btn-small" id="reposition-btn">Reposicionar</button></div>`;
       }
     }
 
@@ -387,23 +388,23 @@ export class GameScreen {
       <div class="hud-row">
         <div class="hud-player ${myTurn && !gameOver ? 'hud-player--active' : ''}">
           <span class="hud-name">${escapeHtml(me.name)}</span>
-          ${me.group ? `<span class="hud-group">${me.group.toUpperCase()}</span>` : ''}
+          ${me.group ? `<span class="hud-group">${groupLabel(me.group)}</span>` : ''}
         </div>
         <div class="hud-turn-indicator">${turnLabel}</div>
         <div class="hud-player ${!myTurn && !gameOver ? 'hud-player--active' : ''}">
           <span class="hud-name">${escapeHtml(opponent.name)}</span>
-          ${opponent.group ? `<span class="hud-group">${opponent.group.toUpperCase()}</span>` : ''}
+          ${opponent.group ? `<span class="hud-group">${groupLabel(opponent.group)}</span>` : ''}
         </div>
       </div>
       <div class="hud-row hud-row--secondary">
         ${this.session.mode === 'online' ? `<div class="hud-status">${statusLabel[status]}</div>` : ''}
         <div class="hud-power">
-          <span class="eyebrow">Shot Power</span>
+          <span class="eyebrow">Força da Tacada</span>
           <div class="power-bar"><div class="power-bar-fill" style="width:${this.power}%"></div></div>
           <span class="power-value">${Math.round(this.power)}%</span>
         </div>
         <div class="hud-buttons">
-          <button class="btn btn-ghost btn-small" id="pause-btn" aria-label="Pause" ${gameOver ? 'disabled' : ''}>⏸</button>
+          <button class="btn btn-ghost btn-small" id="pause-btn" aria-label="Pausar" ${gameOver ? 'disabled' : ''}>⏸</button>
         </div>
       </div>
       ${placementBanner}

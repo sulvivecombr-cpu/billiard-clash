@@ -2,5 +2,12 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "JWT_SECRET",
+      "description": "Signing key for player auth tokens (registration/profile API). A development placeholder is generated automatically; replace it with a strong random value for production.",
+      "requiredAtBoot": true,
+      "generatedForDevelopment": true
+    }
+  ]
 }

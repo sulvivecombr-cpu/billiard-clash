@@ -5,9 +5,9 @@ import { SoundManager } from './audio/SoundManager';
 import { renderMainMenu } from './ui/screens/MainMenu';
 import { renderComputerMenu } from './ui/screens/ComputerMenu';
 import { renderOnlineMenu } from './ui/screens/OnlineMenu';
+import { renderProfile } from './ui/screens/ProfileScreen';
 import { renderHowToPlay } from './ui/screens/HowToPlay';
 import { renderSettings } from './ui/screens/Settings';
-import { renderCredits } from './ui/screens/Credits';
 import { GameScreen } from './game/GameScreen';
 import { VsComputerSession } from './game/VsComputerSession';
 import { OnlineSession } from './game/OnlineSession';
@@ -29,9 +29,9 @@ function showMainMenu(): void {
   renderMainMenu(app, {
     onPlayOnline: showOnlineMenu,
     onPlayComputer: showComputerMenu,
+    onProfile: showProfile,
     onHowToPlay: showHowToPlay,
     onSettings: showSettings,
-    onCredits: showCredits,
   });
 }
 
@@ -56,6 +56,10 @@ function showOnlineMenu(): void {
   });
 }
 
+function showProfile(): void {
+  renderProfile(app, showMainMenu);
+}
+
 function showHowToPlay(): void {
   renderHowToPlay(app, showMainMenu);
 }
@@ -70,10 +74,6 @@ function showSettings(): void {
     },
     showMainMenu
   );
-}
-
-function showCredits(): void {
-  renderCredits(app, showMainMenu);
 }
 
 function launchGame(session: VsComputerSession | OnlineSession): void {

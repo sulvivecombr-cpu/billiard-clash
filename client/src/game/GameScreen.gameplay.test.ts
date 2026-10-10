@@ -235,14 +235,14 @@ describe('GameScreen — end-of-game result modal', () => {
   it('shows a victory modal with winner/opponent names when winnerId is the local player', () => {
     session.triggerStateChange({ phase: 'game_over', winnerId: 'p1' });
     const title = root.querySelector('.result-title');
-    expect(title?.textContent).toContain('YOU WIN');
+    expect(title?.textContent).toContain('VOCÊ VENCEU');
     expect(root.querySelector('.modal-result-detail')?.textContent).toContain('Me');
     expect(root.querySelector('.modal-result-detail')?.textContent).toContain('Them');
   });
 
   it('shows a loss modal when winnerId is the opponent', () => {
     session.triggerStateChange({ phase: 'game_over', winnerId: 'p2' });
-    expect(root.querySelector('.result-title')?.textContent).toContain('YOU LOSE');
+    expect(root.querySelector('.result-title')?.textContent).toContain('VOCÊ PERDEU');
   });
 
   it('renders a confetti layer only on a win, not a loss', () => {
@@ -256,7 +256,7 @@ describe('GameScreen — end-of-game result modal', () => {
   it('the turn indicator shows GAME OVER, not COMPUTER THINKING, once the match has ended', () => {
     session.setMyTurn(false);
     session.triggerStateChange({ phase: 'game_over', winnerId: 'p2' });
-    expect(root.querySelector('.hud-turn-indicator')?.textContent).toBe('GAME OVER');
+    expect(root.querySelector('.hud-turn-indicator')?.textContent).toBe('FIM DE JOGO');
   });
 
   it('Play Again calls requestRematch() for vs-computer mode', () => {
@@ -302,7 +302,7 @@ describe('GameScreen — interactive ball-in-hand placement', () => {
   it('enters placement mode and shows the BALL IN HAND banner when it becomes the player\'s turn with ballInHand active', () => {
     session.triggerStateChange({ ballInHand: true });
     expect((screen as any).ballInHandStage).toBe('placing');
-    expect(root.querySelector('.hud-banner')?.textContent).toContain('BALL IN HAND');
+    expect(root.querySelector('.hud-banner')?.textContent).toContain('BOLA NA MÃO');
   });
 
   it('does not enter placement mode if ballInHand is active but it is not the player\'s turn', () => {

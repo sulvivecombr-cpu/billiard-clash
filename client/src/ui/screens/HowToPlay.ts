@@ -1,34 +1,34 @@
 export function renderHowToPlay(root: HTMLElement, onBack: () => void): void {
   root.innerHTML = `
     <div class="menu-screen screen-enter">
-      <button class="back-link" id="back">&larr; Main Menu</button>
+      <button class="back-link" id="back">&larr; Menu Principal</button>
       <div class="panel menu-panel menu-panel--wide">
-        <h2>HOW TO PLAY</h2>
+        <h2>COMO JOGAR</h2>
         <div class="how-to-content">
-          <h3>Controls</h3>
+          <h3>Controles</h3>
           <div class="control-list">
-            <span class="keycap">Mouse Move</span><span class="control-desc">Aim</span>
-            <span class="keycap">Left Click</span><span class="control-desc">Shoot</span>
-            <span class="keycap">W</span><span class="control-desc">Increase shot power</span>
-            <span class="keycap">S</span><span class="control-desc">Decrease shot power</span>
-            <span class="keycap">Mouse Wheel</span><span class="control-desc">Adjust shot power</span>
-            <span class="keycap">ESC</span><span class="control-desc">Pause menu</span>
+            <span class="keycap">Mover o Mouse</span><span class="control-desc">Mirar</span>
+            <span class="keycap">Clique Esquerdo</span><span class="control-desc">Dar a tacada</span>
+            <span class="keycap">W</span><span class="control-desc">Aumentar a força da tacada</span>
+            <span class="keycap">S</span><span class="control-desc">Diminuir a força da tacada</span>
+            <span class="keycap">Roda do Mouse</span><span class="control-desc">Ajustar a força da tacada</span>
+            <span class="keycap">ESC</span><span class="control-desc">Menu de pausa</span>
           </div>
 
-          <h3>Objective</h3>
-          <p>Pocket all of your assigned group (solids 1–7 or stripes 9–15), then legally pocket the 8-ball to win.</p>
+          <h3>Objetivo</h3>
+          <p>Encaçape todas as bolas do seu grupo (lisas 1–7 ou listradas 9–15) e depois encaçape legalmente a bola 8 para vencer.</p>
 
-          <h3>Break &amp; open table</h3>
-          <p>The table is "open" until a player legally pockets a ball after the break — whichever group they pot first becomes their group for the rest of the game.</p>
+          <h3>Tacada inicial e mesa aberta</h3>
+          <p>A mesa fica "aberta" até que um jogador encaçape legalmente uma bola após a tacada inicial — o grupo que ele encaçapar primeiro passa a ser o seu grupo pelo resto da partida.</p>
 
-          <h3>Fouls</h3>
-          <p>Scratching the cue ball, hitting the wrong group first, failing to contact any ball, or failing to send a ball to a rail after contact all result in a foul. Fouls grant your opponent ball-in-hand — they may place the cue ball anywhere before their next shot.</p>
+          <h3>Faltas</h3>
+          <p>Encaçapar a bola branca, acertar primeiro o grupo errado, não tocar em nenhuma bola ou não mandar nenhuma bola para a tabela após o contato resultam em falta. Uma falta dá bola na mão ao adversário — ele pode posicionar a bola branca em qualquer lugar antes da próxima tacada.</p>
 
-          <h3>The 8-ball</h3>
-          <p>Pocketing the 8-ball before clearing your group is an immediate loss. Pocketing it legally while also scratching the cue ball is also a loss. Pocket it cleanly after clearing your group to win.</p>
+          <h3>A bola 8</h3>
+          <p>Encaçapar a bola 8 antes de limpar o seu grupo é derrota imediata. Encaçapá-la legalmente e ao mesmo tempo encaçapar a bola branca também é derrota. Encaçape-a de forma limpa após limpar o seu grupo para vencer.</p>
 
-          <h3>Rules reference</h3>
-          <p>This game follows the WPA (World Pool-Billiard Association) 8-Ball rules as its primary ruleset.</p>
+          <h3>Referência de regras</h3>
+          <p>Este jogo segue as regras de 8-Bolas da WPA (World Pool-Billiard Association) como referência principal.</p>
         </div>
       </div>
     </div>

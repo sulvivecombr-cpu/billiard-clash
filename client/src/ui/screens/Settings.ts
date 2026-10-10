@@ -5,36 +5,36 @@ export function renderSettings(root: HTMLElement, settings: GameSettings, onChan
   function draw(): void {
     root.innerHTML = `
       <div class="menu-screen screen-enter">
-        <button class="back-link" id="back">&larr; Main Menu</button>
+        <button class="back-link" id="back">&larr; Menu Principal</button>
         <div class="panel menu-panel">
-          <h2>SETTINGS</h2>
+          <h2>CONFIGURAÇÕES</h2>
 
           <div class="settings-row">
-            <label for="master-volume">Master Volume</label>
+            <label for="master-volume">Volume Geral</label>
             <input class="slider" type="range" id="master-volume" min="0" max="100" value="${Math.round(settings.masterVolume * 100)}" />
           </div>
           <div class="settings-row">
-            <label for="sfx-volume">Sound Effects Volume</label>
+            <label for="sfx-volume">Volume dos Efeitos</label>
             <input class="slider" type="range" id="sfx-volume" min="0" max="100" value="${Math.round(settings.sfxVolume * 100)}" />
           </div>
           <div class="settings-row">
-            <label for="music-volume">Music Volume</label>
+            <label for="music-volume">Volume da Música</label>
             <input class="slider" type="range" id="music-volume" min="0" max="100" value="${Math.round(settings.musicVolume * 100)}" />
           </div>
           <div class="settings-row">
-            <label>Aim Line</label>
+            <label>Linha de Mira</label>
             <div class="toggle ${settings.aimLineEnabled ? 'on' : ''}" id="aim-toggle" role="switch" aria-checked="${settings.aimLineEnabled}" tabindex="0"></div>
           </div>
           <div class="settings-row">
-            <label>Fullscreen</label>
+            <label>Tela Cheia</label>
             <div class="toggle ${settings.fullscreen ? 'on' : ''}" id="fullscreen-toggle" role="switch" aria-checked="${settings.fullscreen}" tabindex="0"></div>
           </div>
           <div class="settings-row">
-            <label for="graphics-quality">Graphics Quality</label>
+            <label for="graphics-quality">Qualidade Gráfica</label>
             <select id="graphics-quality" class="field" style="width:auto">
-              <option value="low" ${settings.graphicsQuality === 'low' ? 'selected' : ''}>Low</option>
-              <option value="medium" ${settings.graphicsQuality === 'medium' ? 'selected' : ''}>Medium</option>
-              <option value="high" ${settings.graphicsQuality === 'high' ? 'selected' : ''}>High</option>
+              <option value="low" ${settings.graphicsQuality === 'low' ? 'selected' : ''}>Baixa</option>
+              <option value="medium" ${settings.graphicsQuality === 'medium' ? 'selected' : ''}>Média</option>
+              <option value="high" ${settings.graphicsQuality === 'high' ? 'selected' : ''}>Alta</option>
             </select>
           </div>
         </div>
